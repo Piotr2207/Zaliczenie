@@ -51,5 +51,37 @@ namespace LibApp.Models
                 context.SaveChanges();
             }
         }
+        public static void InitialCustomers(IServiceProvider serviceProvider)
+        {
+            using (var context = new ApplicationDbContext(
+                serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
+            {
+                if (context.Customers.Any())
+                {
+                    Console.WriteLine("Database already seeded");
+                    return;
+                }
+                context.Customers.AddRange(
+                    new Customer
+                    {
+                        Name = "Jan",
+                        HasNewsletterSubscribed = false,
+                        MembershipTypeId = 1,
+                    },
+                     new Customer
+                     {
+                         Name = "Marek",
+                         HasNewsletterSubscribed = true,
+                         MembershipTypeId = 2,
+                     },
+                      new Customer
+                      {
+                          Name = "Tomek",
+                          HasNewsletterSubscribed = false,
+                          MembershipTypeId = 3,
+                      });
+                context.SaveChanges();
+            }
+        }
     }
 }
