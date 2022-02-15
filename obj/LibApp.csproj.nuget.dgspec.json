@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Marcin\\Desktop\\GIT\\LibApp_Gr5\\LibApp\\LibApp.csproj": {}
+    "C:\\Users\\Tomson\\source\\repos\\LibApp-1\\LibApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Marcin\\Desktop\\GIT\\LibApp_Gr5\\LibApp\\LibApp.csproj": {
+    "C:\\Users\\Tomson\\source\\repos\\LibApp-1\\LibApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Marcin\\Desktop\\GIT\\LibApp_Gr5\\LibApp\\LibApp.csproj",
+        "projectUniqueName": "C:\\Users\\Tomson\\source\\repos\\LibApp-1\\LibApp.csproj",
         "projectName": "LibApp",
-        "projectPath": "C:\\Users\\Marcin\\Desktop\\GIT\\LibApp_Gr5\\LibApp\\LibApp.csproj",
-        "packagesPath": "C:\\Users\\Marcin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Marcin\\Desktop\\GIT\\LibApp_Gr5\\LibApp\\obj\\",
+        "projectPath": "C:\\Users\\Tomson\\source\\repos\\LibApp-1\\LibApp.csproj",
+        "packagesPath": "C:\\Users\\Tomson\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Tomson\\source\\repos\\LibApp-1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Marcin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Tomson\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -99,12 +99,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[5.0.13, 5.0.13]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -113,7 +107,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.405\\RuntimeIdentifierGraph.json"
         }
       }
     }
