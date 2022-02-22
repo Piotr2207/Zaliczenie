@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LibApp.Data;
 using LibApp.Dtos;
+using LibApp.Interfaces;
 using LibApp.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,105 +19,106 @@ using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace LibApp.Controllers.Api
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CustomersController : ControllerBase
-    {
-        public CustomersController(ApplicationDbContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
+	[Route("api/[controller]")]
+	[ApiController]
+	public class CustomersController : ControllerBase
+	{
+		public CustomersController(IUnitOfWork unit, IMapper mapper)
+		{
+			_unit = unit;
+			_mapper = mapper;
+		}
 
-        // GET /api/customers
-        [HttpGet]
-        public IActionResult GetCustomers(string query = null)
-        {
-            IEnumerable<Customer> customersQuery = _context.Customers
-                .Include(c => c.MembershipType);
+		// GET /api/customers
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<CustomerDto>>> GetCustomers(string query = null)
+		{
+			IEnumerable<Customer> customersQuery = await _unit.Customers.Get();
 
-            if (!String.IsNullOrWhiteSpace(query))
-            {
-                customersQuery = customersQuery.Where(c => c.Name.Contains(query));
-            }
+			if (!String.IsNullOrWhiteSpace(query))
+			{
+				customersQuery = customersQuery.Where(c => c.Name.Contains(query));
+			}
 
-            var customerDtos = customersQuery
-                .ToList()
-                .Select(_mapper.Map<Customer, CustomerDto>);
+			var customerDtos = customersQuery.Select(_mapper.Map<Customer, CustomerDto>).ToList();
 
-            return Ok(customerDtos);
-        }
+			return customerDtos;
+		}
 
-        // GET /api/customers/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCustomer(int id)
-        {
-            Console.WriteLine("Request beginning");
+		// GET /api/customers/{id}
+		[HttpGet("{id}")]
+		public async Task<ActionResult<CustomerDto>> GetCustomer(int id)
+		{
+			Console.WriteLine("Request beginning");
 
-            var customer = await _context.Customers.SingleOrDefaultAsync(c => c.Id == id);
-            await Task.Delay(2000);
-            if (customer == null)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
-            }
+			var customer = await _unit.Customers.Get(id);
 
-            Console.WriteLine("Request end");
+			await Task.Delay(2000);
 
-            return Ok(_mapper.Map<CustomerDto>(customer));
-        }
+			if (customer == null)
+			{
+				return NotFound("Customer doesn't exist");
+			}
 
-        // POST /api/customers/
-        [HttpPost]
-        public CustomerDto CreateCustomer(CustomerDto customerDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
-            }
+			Console.WriteLine("Request end");
 
-            var customer = _mapper.Map<Customer>(customerDto);
-            _context.Customers.Add(customer);
-            _context.SaveChanges();
-            customerDto.Id = customer.Id;
+			return _mapper.Map<CustomerDto>(customer);
+		}
 
-            return customerDto;
-        }
+		// POST /api/customers/
+		[HttpPost]
+		public async Task<ActionResult<CustomerDto>> CreateCustomer(CustomerDto customerDto)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest("Cannot add customer");
+			}
 
-        // PUT api/customers/{id}
-        [HttpPut("{id}")]
-        public void UpdateCustomer(int id, CustomerDto customerDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.BadRequest);
-            }
+			var customer = _mapper.Map<Customer>(customerDto);
+			await _unit.Customers.Add(customer);
+			await _unit.Complete();
+			customerDto.Id = customer.Id;
 
-            var customerInDb = _context.Customers.SingleOrDefault(c => c.Id == customerDto.Id);
-            if (customerInDb == null)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
-            }
+			return customerDto;
+		}
 
+		// PUT api/customers/{id}
+		[HttpPut("{id}")]
+		public async Task<ActionResult> UpdateCustomer(int id, CustomerDto customerDto)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest("Cannot update customer with the given ID");
+			}
 
-            _mapper.Map(customerDto, customerInDb);
-            _context.SaveChanges();
-        }
+			var customerInDb = await _unit.Customers.Get(customerDto.Id);
+			if (customerInDb == null)
+			{
+				return BadRequest("Cannot update customer with the given ID");
+			}
 
-        // DELETE /api/customers
-        [HttpDelete("{id}")]
-        public void DeleteCusomer(int id)
-        {
-            var customerInDb = _context.Customers.SingleOrDefault(c => c.Id == id);
-            if (customerInDb == null)
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
-            }
+			_unit.Customers.Update(_mapper.Map(customerDto, customerInDb));
+			await _unit.Complete();
+			return Ok();
+		}
 
-            _context.Customers.Remove(customerInDb);
-            _context.SaveChanges();
-        }
+		// DELETE /api/customers
+		[HttpDelete("{id}")]
+		public async Task<ActionResult> DeleteCusomer(int id)
+		{
+			var customerInDb = await _unit.Customers.Get(id);
 
-        private ApplicationDbContext _context;
-        private readonly IMapper _mapper;
-    }
+			if (customerInDb == null)
+			{
+				return BadRequest("Cannot delete customer with the given ID");
+			}
+
+			_unit.Customers.Delete(customerInDb);
+			await _unit.Complete();
+			return Ok();
+		}
+
+		private readonly IUnitOfWork _unit;
+		private readonly IMapper _mapper;
+	}
 }

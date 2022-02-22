@@ -7,103 +7,108 @@ using LibApp.Models;
 using LibApp.ViewModels;
 using LibApp.Data;
 using Microsoft.EntityFrameworkCore;
-
+using System.Net.Http;
+using System.Net;
 namespace LibApp.Controllers
 {
-    public class CustomersController : Controller
-    {
-        private readonly ApplicationDbContext _context;
+	public class CustomersController : Controller
+	{
+		private static readonly HttpClient _http = new();
+		public CustomersController()
+		{
+		}
 
-        public CustomersController(ApplicationDbContext contex)
-        {
-            _context = contex;
-        }
+		public ViewResult Index()
+		{
+			return View();
+		}
 
-        public ViewResult Index()
-        {
-            return View();
-        }
+		public async Task<IActionResult> Details(int id)
+		{
+			var response = await _http.GetAsync($"https://localhost:5001/api/customers/{id}");
 
-        public IActionResult Details(int id)
-        {
-            var customer = _context.Customers
-                .Include(c => c.MembershipType)
-                .SingleOrDefault(c => c.Id == id);
+			if (response.StatusCode == HttpStatusCode.NotFound)
+			{
+				return Content("User not found");
+			}
 
-            if (customer == null)
-            {
-                return Content("User not found");
-            }
+			var customer = await response.Content.ReadAsAsync<Customer>();
 
-            return View(customer);
-        }
+			return View(customer);
+		}
 
-        public IActionResult New()
-        {
-            var membershipTypes = _context.MembershipTypes.ToList();
+		public async Task<IActionResult> New()
+		{
 
-            var viewModel = new CustomerFormViewModel()
-            {
-                MembershipTypes = membershipTypes
-            };
+			var response = await _http.GetAsync("https://localhost:5001/api/mstypes/");
+			var membershipTypes = await response.Content.ReadAsAsync<IEnumerable<MembershipType>>();
+
+			var viewModel = new CustomerFormViewModel()
+			{
+				MembershipTypes = membershipTypes
+			};
 
 
-            return View("CustomerForm", viewModel);
-        }
+			return View("CustomerForm", viewModel);
+		}
 
-        public IActionResult Edit(int id)
-        {
-            var customer = _context.Customers.SingleOrDefault(c => c.Id == id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
+		public async Task<IActionResult> Edit(int id)
+		{
 
-            var viewModel = new CustomerFormViewModel(customer)
-            {
-                MembershipTypes = _context.MembershipTypes.ToList()
-            };
+			var conRes = await _http.GetAsync($"https://localhost:5001/api/customers/{id}");
 
-            return View("CustomerForm", viewModel);
-        }
+			if (conRes.StatusCode == HttpStatusCode.NotFound)
+			{
+				return NotFound();
+			}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Save(Customer customer)
-        {
-            if (!ModelState.IsValid)
-            {
-                var viewModel = new CustomerFormViewModel(customer)
-                {
-                    MembershipTypes = _context.MembershipTypes.ToList()
-                };
+			var customer = await conRes.Content.ReadAsAsync<Customer>();
 
-                return View("CustomerForm", viewModel);
-            }
+			var msTypeRes = await _http.GetAsync("https://localhost:5001/api/mstypes");
+			var membershipTypes = await msTypeRes.Content.ReadAsAsync<IEnumerable<MembershipType>>();
 
-            if (customer.Id == 0) 
-            { 
-                _context.Customers.Add(customer);
-            }
-            else
-            {
-                var customerInDb = _context.Customers.Single(c => c.Id == customer.Id);
-                customerInDb.Name = customer.Name;
-                customerInDb.Birthdate = customer.Birthdate;
-                customerInDb.MembershipTypeId = customer.MembershipTypeId;
-                customerInDb.HasNewsletterSubscribed = customer.HasNewsletterSubscribed;
-            }
+			var viewModel = new CustomerFormViewModel(customer)
+			{
+				MembershipTypes = membershipTypes
+			};
 
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException e)
-            {
-                Console.WriteLine(e);
-            }
+			return View("CustomerForm", viewModel);
+		}
 
-            return RedirectToAction("Index", "Customers");
-        }
-    }
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Save(Customer customer)
+		{
+			if (!ModelState.IsValid)
+			{
+
+				var msTypeRes = await _http.GetAsync("https://localhost:5001/api/mstypes/");
+				var membershipTypes = await msTypeRes.Content.ReadAsAsync<IEnumerable<MembershipType>>();
+
+				var viewModel = new CustomerFormViewModel(customer)
+				{
+					MembershipTypes = membershipTypes
+				};
+
+				return View("CustomerForm", viewModel);
+			}
+
+			if (customer.Id == 0)
+			{
+				var cusRes = await _http.PostAsJsonAsync("https://localhost:5001/api/customers", customer);
+
+				if (cusRes.StatusCode != HttpStatusCode.OK)
+					return Content("Cannot create the new customer");
+			}
+			else
+			{
+				var cusRes = await _http.PutAsJsonAsync($"https://localhost:5001/api/customers/{customer.Id}", customer);
+
+				if (cusRes.StatusCode != HttpStatusCode.OK)
+					return Content("Cannot update the selected customer");
+			}
+
+			return RedirectToAction("Index", "Customers");
+		}
+	}
 }

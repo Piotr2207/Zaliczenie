@@ -7,6 +7,7 @@ using LibApp.Models;
 using LibApp.ViewModels;
 using LibApp.Data;
 using Microsoft.EntityFrameworkCore;
+using LibApp.Interfaces;
 
 namespace LibApp.Controllers
 {
@@ -14,16 +15,17 @@ namespace LibApp.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public BooksController(ApplicationDbContext contex)
+        private readonly IBooksRepository _bookRepository;
+
+        public BooksController(ApplicationDbContext contex, IBooksRepository bookRepository)
         {
             _context = contex;
+            _bookRepository = bookRepository;
         }
 
         public IActionResult Index()
         {
-            var books = _context.Books
-                .Include(b => b.Genre)
-                .ToList();
+            var books = _bookRepository.GetBooks();
 
             return View(books);
         }
@@ -44,11 +46,12 @@ namespace LibApp.Controllers
 
         public IActionResult Edit(int id)
         {
-            var book = _context.Books.SingleOrDefault(b => b.Id == id);
-            if (book == null)
+            var book = _bookRepository.EditBook(id);
+
+           /* if (book == null)
             {
                 return NotFound();
-            }
+            }*/
 
             var viewModel = new BookFormViewModel
             {
