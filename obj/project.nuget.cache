@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "cYsfEO171E1rV4K4pkt1U9frwXrTE+SrcD6UqWTQlBezzDpX+T596Hs+i2iSpI+/6MrVKbKMoNTQw4SFSzO91g==",
+  "dgSpecHash": "SZ2wPFn1QpxFc/p+G+PZIQjkRsIiHzpdNOgFSKjYpIBdJwF5fjczsZwSEtRIn1s48z1wBRk5k21rqTY8BDjNzQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Tomson\\source\\repos\\LibApp-1\\LibApp.csproj",
   "expectedPackageFiles": [
@@ -10,6 +10,7 @@
     "C:\\Users\\Tomson\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\Tomson\\.nuget\\packages\\jquery\\1.12.4\\jquery.1.12.4.nupkg.sha512",
     "C:\\Users\\Tomson\\.nuget\\packages\\jquery.datatables\\1.10.15\\jquery.datatables.1.10.15.nupkg.sha512",
+    "C:\\Users\\Tomson\\.nuget\\packages\\microsoft.aspnet.identity.core\\2.2.3\\microsoft.aspnet.identity.core.2.2.3.nupkg.sha512",
     "C:\\Users\\Tomson\\.nuget\\packages\\microsoft.aspnet.webapi.client\\5.2.7\\microsoft.aspnet.webapi.client.5.2.7.nupkg.sha512",
     "C:\\Users\\Tomson\\.nuget\\packages\\microsoft.aspnet.webapi.core\\5.2.7\\microsoft.aspnet.webapi.core.5.2.7.nupkg.sha512",
     "C:\\Users\\Tomson\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\5.0.9\\microsoft.aspnetcore.cryptography.internal.5.0.9.nupkg.sha512",
@@ -164,6 +165,16 @@
     "C:\\Users\\Tomson\\.nuget\\packages\\twitter.typeahead\\0.11.1\\twitter.typeahead.0.11.1.nupkg.sha512"
   ],
   "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Pakiet „Microsoft.AspNet.Identity.Core 2.2.3” został przywrócony przy użyciu elementu „.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8” zamiast platformy docelowej projektu „net5.0”. Ten pakiet może nie być w pełni kompatybilny z Twoim projektem.",
+      "libraryId": "Microsoft.AspNet.Identity.Core",
+      "targetGraphs": [
+        "net5.0"
+      ]
+    },
     {
       "code": "NU1701",
       "level": "Warning",

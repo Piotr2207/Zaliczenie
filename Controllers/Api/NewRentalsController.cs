@@ -14,9 +14,9 @@ namespace LibApp.Controllers.Api
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class NewRentalsController : ControllerBase
+	public class RentalsController : ControllerBase
 	{
-		public NewRentalsController(IUnitOfWork unit)
+		public RentalsController(IUnitOfWork unit)
 		{
 			_unit = unit;
 		}

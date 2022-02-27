@@ -1,18 +1,21 @@
-using LibApp.Data;
-using LibApp.Interfaces;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LibApp.Data;
+using LibApp.Interfaces;
+using LibApp.Models;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace LibApp
 {
@@ -36,7 +39,12 @@ namespace LibApp
 
 			services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-			services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+			services.AddDefaultIdentity<Customer>(options => options.SignIn.RequireConfirmedAccount = true)
+				.AddRoles<ApplicationRole>()
+				.AddRoleManager<RoleManager<ApplicationRole>>()
+				.AddUserManager<UserManager<Customer>>()
+				.AddSignInManager<SignInManager<Customer>>()
+				.AddRoleValidator<RoleValidator<ApplicationRole>>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 			services.AddControllersWithViews();
 		}
@@ -57,7 +65,6 @@ namespace LibApp
 			}
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
-
 			app.UseRouting();
 
 			app.UseAuthentication();

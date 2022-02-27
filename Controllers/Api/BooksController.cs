@@ -24,7 +24,7 @@ namespace LibApp.Controllers.Api
 		}
 
 		// GET /api/books/{id}
-		[HttpGet]
+		[HttpGet("{id}")]
 		public async Task<ActionResult<Book>> GetBook(int id)
 		{
 			var book = await _unit.Books.Get(id);

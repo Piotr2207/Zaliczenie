@@ -11,18 +11,18 @@
 
 <table id="customers" class="table table-hover">
     <thead>
-    <tr>
-        <th>Customer</th>
-        <th>Membership Type</th>
-        <th>Delete</th>
-    </tr>
+        <tr>
+            <th>Customer</th>
+            <th>Membership Type</th>
+            <th>Delete</th>
+        </tr>
     </thead>
     <tbody>
     </tbody>
 </table>
 
 
-@section Scripts  
+@section Scripts
 {
     <script>
         $(document).ready(function () {
@@ -35,7 +35,7 @@
                     {
                         data: "name",
                         render: function (data, type, customer) {
-                            return "<a href='customers/edit/" + customer.id + "'>" + customer.name + "</a>";
+                            return "<a href='/customers/details/" + customer.id + "'>" + customer.name + "</a>";
                         }
                     },
                     {
@@ -55,7 +55,6 @@
     <script>
         $(document).ready(function () {
             var table = $("#customers").DataTable();
-
             $("#customers").on("click", ".js-delete", function () {
                 var button = $(this);
                 bootbox.confirm({
@@ -82,7 +81,6 @@
                         }
                     }
                 });
-
             });
         });
     </script>

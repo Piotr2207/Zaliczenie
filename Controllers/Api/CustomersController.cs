@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Http;
+using AutoMapper;
 using LibApp.Data;
 using LibApp.Dtos;
 using LibApp.Interfaces;
@@ -6,11 +11,6 @@ using LibApp.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Http;
 using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
 using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
@@ -53,8 +53,6 @@ namespace LibApp.Controllers.Api
 
 			var customer = await _unit.Customers.Get(id);
 
-			await Task.Delay(2000);
-
 			if (customer == null)
 			{
 				return NotFound("Customer doesn't exist");
@@ -82,7 +80,7 @@ namespace LibApp.Controllers.Api
 			return customerDto;
 		}
 
-		// PUT api/customers/{id}
+		// PUT /api/customers/{id}
 		[HttpPut("{id}")]
 		public async Task<ActionResult> UpdateCustomer(int id, CustomerDto customerDto)
 		{

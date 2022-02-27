@@ -32,7 +32,6 @@ namespace LibApp.Controllers.Api
 
 		// GET /api/mstypes
 		[HttpGet]
-		[Route("mstypes")]
 		public async Task<ActionResult<IEnumerable<MembershipTypeDto>>> GetMembershipTypes()
 		{
 			IEnumerable<MembershipType> msTypes = await _unit.MembershipTypes.Get();

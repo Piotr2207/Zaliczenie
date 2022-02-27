@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace LibApp.Data.Migrations
+namespace LibApp.Migrations
 {
-    public partial class AddNameToMembershipType : Migration
+    public partial class AddRoleTry1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Name",
-                table: "MembershipTypes",
-                type: "nvarchar(255)",
-                maxLength: 255,
+                name: "Discriminator",
+                table: "AspNetUserRoles",
+                type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
         }
@@ -18,8 +17,8 @@ namespace LibApp.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Name",
-                table: "MembershipTypes");
+                name: "Discriminator",
+                table: "AspNetUserRoles");
         }
     }
 }

@@ -5,103 +5,107 @@ using System.Linq;
 using System.Threading.Tasks;
 using LibApp.Models;
 using LibApp.ViewModels;
-using LibApp.Data;
+using LibApp.Dtos;
 using Microsoft.EntityFrameworkCore;
-using LibApp.Interfaces;
+using System.Net.Http;
+using System.Net;
 
 namespace LibApp.Controllers
 {
-    public class BooksController : Controller
-    {
-        private readonly ApplicationDbContext _context;
+	public class BooksController : Controller
+	{
+		private static readonly HttpClient _http = new(new HttpClientHandler()
+		{
+			ServerCertificateCustomValidationCallback = (a, b, c, d) => true
+		});
+		public BooksController()
+		{
+		}
 
-        private readonly IBooksRepository _bookRepository;
+		public async Task<IActionResult> Index()
+		{
+			var response = await _http.GetAsync("https://localhost:5001/api/books");
+			var books = await response.Content.ReadAsAsync<IEnumerable<Book>>();
 
-        public BooksController(ApplicationDbContext contex, IBooksRepository bookRepository)
-        {
-            _context = contex;
-            _bookRepository = bookRepository;
-        }
+			return View(books);
+		}
 
-        public IActionResult Index()
-        {
-            var books = _bookRepository.GetBooks();
+		public async Task<IActionResult> Details(int id)
+		{
 
-            return View(books);
-        }
+			var response = await _http.GetAsync($"https://localhost:5001/api/books/{id}");
 
-        public IActionResult Details(int id)
-        {
-            var book = _context.Books
-                .Include(b => b.Genre)
-                .SingleOrDefault(b => b.Id == id);
+			if (response.StatusCode == HttpStatusCode.NotFound)
+			{
+				return NotFound("Book not found");
+			}
 
-            if (book == null)
-            {
-                return Content("Book not found");
-            }
+			var book = await response.Content.ReadAsAsync<Book>();
 
-            return View(book);
-        }
+			return View(book);
+		}
 
-        public IActionResult Edit(int id)
-        {
-            var book = _bookRepository.EditBook(id);
+		public async Task<IActionResult> Edit(int id)
+		{
+			var response = await _http.GetAsync($"https://localhost:5001/api/books/{id}");
 
-           /* if (book == null)
-            {
-                return NotFound();
-            }*/
+			if (response.StatusCode == HttpStatusCode.NotFound)
+			{
+				return NotFound("Book not found");
+			}
 
-            var viewModel = new BookFormViewModel
-            {
-                Book = book,
-                Genres = _context.Genre.ToList()
-            };
+			var book = await response.Content.ReadAsAsync<Book>();
 
-            return View("BookForm", viewModel);
-        }
+			var genRes = await _http.GetAsync($"https://localhost:5001/api/genre");
+			var genres = await genRes.Content.ReadAsAsync<IEnumerable<Genre>>();
 
-        public IActionResult New()
-        {
-            var genres = _context.Genre.ToList();
-            var viewModel = new BookFormViewModel
-            {
-                Genres = genres
-            };
+			var viewModel = new BookFormViewModel
+			{
+				Book = book,
+				Genres = genres
+			};
 
-            return View("BookForm", viewModel);
-        }
+			return View("BookForm", viewModel);
+		}
 
-        public IActionResult Save(Book book)
-        {
-            if (book.Id == 0)
-            {
-                book.DateAdded = DateTime.Now;
-                _context.Books.Add(book);
-            }
-            else
-            {
-                var bookInDb = _context.Books.SingleOrDefault(b => b.Id == book.Id);
-                bookInDb.Name = book.Name;
-                bookInDb.AuthorName = book.AuthorName;
-                bookInDb.ReleaseDate = book.ReleaseDate;
-                bookInDb.GenreId = book.GenreId;
-                bookInDb.NumberInStock = book.NumberInStock;
-            }
+		public async Task<IActionResult> New()
+		{
+			var genRes = await _http.GetAsync($"https://localhost:5001/api/genre");
+			var genres = await genRes.Content.ReadAsAsync<IEnumerable<Genre>>();
 
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException e)
-            {
-                Console.WriteLine(e);
-            }
+			var viewModel = new BookFormViewModel
+			{
+				Genres = genres
+			};
 
-            return RedirectToAction("Index", "Books");
-        }
+			return View("BookForm", viewModel);
+		}
+
+		public async Task<IActionResult> Save(Book book)
+		{
+			if (book.Id == 0)
+			{
+				book.DateAdded = DateTime.Now;
+				var response = await _http.PutAsJsonAsync($"https://localhost:5001/api/books/{book.Id}", book);
+
+				if (response.StatusCode != HttpStatusCode.OK)
+				{
+					return BadRequest("Cannot update book");
+				}
+			}
+			else
+			{
+				var response = await _http.PutAsJsonAsync($"https://localhost:5001/api/books/{book.Id}", book);
+
+				if (response.StatusCode != HttpStatusCode.OK)
+				{
+					return BadRequest("Cannot update book");
+				}
+			}
+
+			return RedirectToAction("Index", "Books");
+		}
 
 
-    }
+	}
 }

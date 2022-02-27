@@ -11,28 +11,29 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LibApp
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var host = CreateHostBuilder(args).Build();
-            
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
+	public class Program
+	{
+		public static async Task Main(string[] args)
+		{
+			var host = CreateHostBuilder(args).Build();
 
-                SeedData.Initialize(services);
-                SeedData.InitialCustomers(services);
-            }
+			using (var scope = host.Services.CreateScope())
+			{
+				var services = scope.ServiceProvider;
 
-            host.Run();
-        }
+				SeedData.InitMembershipTypes(services);
+				await SeedData.InitRoles(services);
+				await SeedData.InitCustomers(services);
+			}
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+			host.Run();
+		}
+
+		public static IHostBuilder CreateHostBuilder(string[] args) =>
+			Host.CreateDefaultBuilder(args)
+				.ConfigureWebHostDefaults(webBuilder =>
+				{
+					webBuilder.UseStartup<Startup>();
+				});
+	}
 }
