@@ -43,7 +43,7 @@ public class AccountController : Controller
             var user = new Customer
             {
                 Name = model.Name,
-                UserName = model.Email,
+                UserName = model.Username,
                 Email = model.Email,
                 HasNewsletterSubscribed = false,
                 MembershipTypeId = 1,
@@ -91,7 +91,7 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            var result = await _signInManager.PasswordSignInAsync(user.Email, user.Password, true, false);
+            var result = await _signInManager.PasswordSignInAsync(user.Username, user.Password, true, false);
 
             if (result.Succeeded)
             {

@@ -37,7 +37,6 @@ public class BooksRepository : IBooksRepository
 
 	public async Task<IEnumerable<Book>> Get(Expression<Func<Book, bool>> filter)
 	{
-		Console.WriteLine("We are in GET");
 		return await _ctx.Books.Where(filter).Include(b => b.Genre).ToListAsync();
 	}
 

@@ -49,16 +49,12 @@ namespace LibApp.Controllers.Api
 		[HttpGet("{id}")]
 		public async Task<ActionResult<CustomerDto>> GetCustomer(int id)
 		{
-			Console.WriteLine("Request beginning");
-
 			var customer = await _unit.Customers.Get(id);
 
 			if (customer == null)
 			{
 				return NotFound("Customer doesn't exist");
 			}
-
-			Console.WriteLine("Request end");
 
 			return _mapper.Map<CustomerDto>(customer);
 		}
@@ -101,7 +97,6 @@ namespace LibApp.Controllers.Api
 		}
 
 		// DELETE /api/customers
-		[Authorize(Roles="Owner")]
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> DeleteCusomer(int id)
 		{

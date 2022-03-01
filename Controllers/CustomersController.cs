@@ -5,8 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using LibApp.Data;
+using LibApp.Dtos;
 using LibApp.Models;
 using LibApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 namespace LibApp.Controllers
@@ -22,24 +24,28 @@ namespace LibApp.Controllers
 
 		}
 
+		[Authorize(Roles = "Owner,StoreManager")]
 		public ViewResult Index()
 		{
 			return View();
 		}
 
+		[Authorize(Roles = "Owner,StoreManager")]
 		public async Task<IActionResult> Details(int id)
 		{
 			var response = await _http.GetAsync($"https://localhost:5001/api/customers/{id}");
+
 			if (response.StatusCode == HttpStatusCode.NotFound)
 			{
 				return NotFound("Customer not found");
 			}
 
-			var customer = await response.Content.ReadAsAsync<Customer>();
+			var customer = await response.Content.ReadAsAsync<CustomerDto>();
 
 			return View(customer);
 		}
 
+		[Authorize(Roles = "Owner")]
 		public async Task<IActionResult> New()
 		{
 
@@ -55,6 +61,7 @@ namespace LibApp.Controllers
 			return View("CustomerForm", viewModel);
 		}
 
+		[Authorize(Roles = "Owner")]
 		public async Task<IActionResult> Edit(int id)
 		{
 			var conRes = await _http.GetAsync($"https://localhost:5001/api/customers/{id}");
@@ -79,6 +86,7 @@ namespace LibApp.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[Authorize(Roles = "Owner")]
 		public async Task<IActionResult> Save(Customer customer)
 		{
 			if (!ModelState.IsValid)

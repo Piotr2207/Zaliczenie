@@ -1,15 +1,18 @@
 ﻿using AutoMapper;
-using LibApp.Data;
-using LibApp.Dtos;
 using LibApp.Interfaces;
 using LibApp.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Http;
+
+using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
+using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
+using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace LibApp.Controllers.Api
 {
@@ -41,7 +44,6 @@ namespace LibApp.Controllers.Api
 		[HttpGet]
 		public async Task<IEnumerable<Book>> GetBooks(string query = null)
 		{
-			Console.WriteLine("We are in get API controller");
 			var booksQuery = await _unit.Books.Get(b => b.NumberAvailable > 0);
 
 			if (!String.IsNullOrWhiteSpace(query))
@@ -54,6 +56,7 @@ namespace LibApp.Controllers.Api
 
 		// POST api/books
 		[HttpPost]
+		[Authorize(Roles = "Owner,StoreManager")]
 		public async Task<ActionResult> CreateBook(Book book)
 		{		
 			await _unit.Books.Add(book);

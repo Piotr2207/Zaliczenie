@@ -9,6 +9,7 @@ using LibApp.Dtos;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibApp.Controllers
 {
@@ -22,6 +23,7 @@ namespace LibApp.Controllers
 		{
 		}
 
+		[Authorize(Roles = "Owner,StoreManager,User")]
 		public async Task<IActionResult> Index()
 		{
 			var response = await _http.GetAsync("https://localhost:5001/api/books");
@@ -30,6 +32,7 @@ namespace LibApp.Controllers
 			return View(books);
 		}
 
+		[Authorize(Roles = "Owner,StoreManager,User")]
 		public async Task<IActionResult> Details(int id)
 		{
 
@@ -45,6 +48,7 @@ namespace LibApp.Controllers
 			return View(book);
 		}
 
+		[Authorize(Roles = "Owner,StoreManager")]
 		public async Task<IActionResult> Edit(int id)
 		{
 			var response = await _http.GetAsync($"https://localhost:5001/api/books/{id}");
@@ -68,6 +72,7 @@ namespace LibApp.Controllers
 			return View("BookForm", viewModel);
 		}
 
+		[Authorize(Roles = "Owner,StoreManager")]
 		public async Task<IActionResult> New()
 		{
 			var genRes = await _http.GetAsync($"https://localhost:5001/api/genre");
@@ -81,6 +86,7 @@ namespace LibApp.Controllers
 			return View("BookForm", viewModel);
 		}
 
+		[Authorize(Roles = "Owner,StoreManager")]
 		public async Task<IActionResult> Save(Book book)
 		{
 			if (book.Id == 0)

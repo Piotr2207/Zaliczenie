@@ -1,4 +1,4 @@
-@model LibApp.Models.Customer
+@model LibApp.Dtos.CustomerDto;
 
 @{
     ViewBag.Title = Model.Name;
@@ -14,6 +14,6 @@
     } 
 </ul>
 
-@if (Model.Roles?.Where(ur => ur.Role.Name == "Owner").FirstOrDefault() != null) {
+@if (User.IsInRole("Owner")) {
     <button value="Edit" onclick="location.href='@Url.Action("Edit", new {Model.Id})'">Edit</button>
 }

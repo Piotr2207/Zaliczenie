@@ -34,18 +34,38 @@ public class CustomersRepository : ICustomersRepository
 
 	public async Task<Customer> Get(int id)
 	{
-		return await _ctx.Users.Include(c => c.MembershipType).SingleOrDefaultAsync(c => c.Id == id);
+		var user = await _ctx.Users.Include(c => c.MembershipType).Include(c => c.Roles).SingleOrDefaultAsync(c => c.Id == id);
+
+		foreach (var role in user.Roles) {
+			role.Role = await _ctx.Roles.SingleOrDefaultAsync(r => r.Id == role.RoleId);
+		}
+
+		return user;
 	}
 
 	public async Task<IEnumerable<Customer>> Get(Expression<Func<Customer, bool>> filter)
 	{
-		return await _ctx.Users.Where(filter).Include(c => c.MembershipType).ToListAsync();
+		var users =  await _ctx.Users.Where(filter).Include(c => c.MembershipType).Include(c => c.Roles).ToListAsync();
+
+		foreach (var user in users) {
+			foreach (var role in user.Roles) {
+				role.Role = await _ctx.Roles.SingleOrDefaultAsync(r => r.Id == role.RoleId);
+			}
+		}
+
+		return users;
 	}
 
 	public async Task<IEnumerable<Customer>> Get()
 	{
-		return await _ctx.Users.Include(c => c.MembershipType).ToListAsync();
+		var users = await _ctx.Users.Include(c => c.MembershipType).Include(c => c.Roles).ToListAsync();
+
+		foreach (var user in users) {
+			foreach (var role in user.Roles) {
+				role.Role = await _ctx.Roles.SingleOrDefaultAsync(r => r.Id == role.RoleId);
+			}
+		}
+
+		return users;
 	}
-
-
 }
