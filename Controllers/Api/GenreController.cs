@@ -17,23 +17,21 @@ using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
-namespace LibApp.Controllers.Api
+namespace LibApp.Controllers.Api;
+public class GenreController : BaseController
 {
-	public class GenreController : BaseController
+	private readonly IUnitOfWork _unit;
+	public GenreController(IUnitOfWork unit)
 	{
-		private readonly IUnitOfWork _unit;
-		public GenreController(IUnitOfWork unit)
-		{
-			_unit = unit;
-		}
-
-		// GET /api/genre
-		[HttpGet]
-		public async Task<IEnumerable<Genre>> GetGenres()
-		{
-			var genresQuery = await _unit.Genre.Get();
-			return genresQuery.ToList();
-		}
-
+		_unit = unit;
 	}
+
+	// GET /api/genre
+	[HttpGet]
+	public async Task<IEnumerable<Genre>> GetGenres()
+	{
+		var genresQuery = await _unit.Genre.Get();
+		return genresQuery.ToList();
+	}
+
 }

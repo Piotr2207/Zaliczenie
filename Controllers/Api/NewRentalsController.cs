@@ -1,22 +1,22 @@
-﻿using LibApp.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using LibApp.Data;
 using LibApp.Dtos;
 using LibApp.Interfaces;
 using LibApp.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LibApp.Controllers.Api
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class RentalsController : ControllerBase
+	public class NewRentalsController : ControllerBase
 	{
-		public RentalsController(IUnitOfWork unit)
+		public NewRentalsController(IUnitOfWork unit)
 		{
 			_unit = unit;
 		}

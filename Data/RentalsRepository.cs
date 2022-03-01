@@ -6,29 +6,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibApp.Data
+namespace LibApp.Data;
+public class RentalsRepository : IRentalsRepository
 {
-	public class RentalsRepository : IRentalsRepository
+	private readonly ApplicationDbContext _ctx;
+
+	public RentalsRepository(ApplicationDbContext ctx)
 	{
-		private readonly ApplicationDbContext _ctx;
+		_ctx = ctx;
+	}
+	public async Task Add(Rental rental)
+	{
+		await _ctx.Rentals.AddAsync(rental);
+	}
 
-		public RentalsRepository(ApplicationDbContext ctx)
-		{
-			_ctx = ctx;
-		}
-		public async Task Add(Rental rental)
-		{
-			await _ctx.Rentals.AddAsync(rental);
-		}
+	public async Task<Rental> Get(int id)
+	{
+		return await _ctx.Rentals.SingleOrDefaultAsync(r => r.Id == id);
+	}
 
-		public async Task<Rental> Get(int id)
-		{
-			return await _ctx.Rentals.SingleOrDefaultAsync(r => r.Id == id);
-		}
-
-		public async Task<IEnumerable<Rental>> Get()
-		{
-			return await _ctx.Rentals.ToListAsync();
-		}
+	public async Task<IEnumerable<Rental>> Get()
+	{
+		return await _ctx.Rentals.ToListAsync();
 	}
 }

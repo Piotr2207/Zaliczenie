@@ -101,6 +101,7 @@ namespace LibApp.Controllers.Api
 		}
 
 		// DELETE /api/customers
+		[Authorize(Roles="Owner")]
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> DeleteCusomer(int id)
 		{

@@ -55,7 +55,7 @@ namespace LibApp.Controllers.Api
 		// POST api/books
 		[HttpPost]
 		public async Task<ActionResult> CreateBook(Book book)
-		{
+		{		
 			await _unit.Books.Add(book);
 			await _unit.Complete();
 			return Ok();

@@ -6,68 +6,67 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using LibApp.Interfaces;
-namespace LibApp.Models
+namespace LibApp.Models;
+
+public static class SeedData
 {
-
-	public static class SeedData
+	public static void InitMembershipTypes(IServiceProvider serviceProvider)
 	{
-		public static void InitMembershipTypes(IServiceProvider serviceProvider)
+		using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
+		if (context.MembershipTypes.Any())
 		{
-			using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
-			if (context.MembershipTypes.Any())
-			{
-				Console.WriteLine("MemberShipTypes already seeded");
-				return;
-			}
-
-			context.MembershipTypes.AddRange(
-				new MembershipType
-				{
-					Id = 1,
-					Name = "Pay as you go",
-					SignUpFee = 0,
-					DurationInMonths = 0,
-					DiscountRate = 0
-				},
-				new MembershipType
-				{
-					Id = 2,
-					Name = "Monthly",
-					SignUpFee = 30,
-					DurationInMonths = 1,
-					DiscountRate = 10
-				},
-				new MembershipType
-				{
-					Id = 3,
-					Name = "Quaterly",
-					SignUpFee = 90,
-					DurationInMonths = 3,
-					DiscountRate = 15
-				},
-				new MembershipType
-				{
-					Id = 4,
-					Name = "Yearly",
-					SignUpFee = 300,
-					DurationInMonths = 12,
-					DiscountRate = 20
-				});
-
-			context.SaveChanges();
+			Console.WriteLine("MemberShipTypes already seeded");
+			return;
 		}
 
-		public static async Task InitCustomers(IServiceProvider serviceProvider)
-		{
-			var userManager = serviceProvider.GetRequiredService<UserManager<Customer>>();
-
-			if (await userManager.Users.AnyAsync())
+		context.MembershipTypes.AddRange(
+			new MembershipType
 			{
-				Console.WriteLine("Customers already seeded");
-				return;
-			}
+				Id = 1,
+				Name = "Pay as you go",
+				SignUpFee = 0,
+				DurationInMonths = 0,
+				DiscountRate = 0
+			},
+			new MembershipType
+			{
+				Id = 2,
+				Name = "Monthly",
+				SignUpFee = 30,
+				DurationInMonths = 1,
+				DiscountRate = 10
+			},
+			new MembershipType
+			{
+				Id = 3,
+				Name = "Quaterly",
+				SignUpFee = 90,
+				DurationInMonths = 3,
+				DiscountRate = 15
+			},
+			new MembershipType
+			{
+				Id = 4,
+				Name = "Yearly",
+				SignUpFee = 300,
+				DurationInMonths = 12,
+				DiscountRate = 20
+			});
 
-			Customer[] users = {
+		context.SaveChanges();
+	}
+
+	public static async Task  InitCustomers(IServiceProvider serviceProvider)
+	{
+		var userManager = serviceProvider.GetRequiredService<UserManager<Customer>>();
+
+		if (await userManager.Users.AnyAsync())
+		{
+			Console.WriteLine("Customers already seeded");
+			return;
+		}
+
+		Customer[] users = {
 			new Customer
 			{
 				Name = "Jan",
@@ -88,55 +87,51 @@ namespace LibApp.Models
 			}
 		};
 
-			foreach (var user in users)
-			{
-				user.UserName = user.Name.ToLower();
-				await userManager.CreateAsync(user, "User5!3@");
-				await userManager.AddToRoleAsync(user, "User");
-			}
-
-			var owner = new Customer
-			{
-				Name = "Wojtek",
-				UserName = "owner",
-				Email = "owner@owner.pl",
-				HasNewsletterSubscribed = true,
-				MembershipTypeId = 3,
-			};
-
-			await userManager.CreateAsync(owner, "Wojtek!21");
-			await userManager.AddToRoleAsync(owner, "Owner");
-
+		foreach (var user in users) {
+			user.UserName = user.Name.ToLower();
+			await userManager.CreateAsync(user, "Passwordzisko123!@#");
+			await userManager.AddToRoleAsync(user, "User");
 		}
 
-		public static async Task InitRoles(IServiceProvider service)
-		{
-			var roleManager = service.GetRequiredService<RoleManager<ApplicationRole>>();
-			string[] rolesNames = { "User", "StoreManager", "Owner" };
+		var owner = new Customer {
+			Name = "Ryszardos",
+			UserName = "owner",
+			Email = "owner@owner.pl",
+			HasNewsletterSubscribed = true,
+			MembershipTypeId = 3,
+		};
 
-			foreach (var roleName in rolesNames)
-			{
-				var roleExist = await roleManager.RoleExistsAsync(roleName);
+		await userManager.CreateAsync(owner, "Passwordzisko123!");
+		await userManager.AddToRoleAsync(owner, "Owner");
 
-				if (!roleExist)
-				{
-					await roleManager.CreateAsync(new ApplicationRole { Name = roleName });
-				}
+	}
+
+	public static async Task InitRoles(IServiceProvider service) 
+	{
+		var roleManager = service.GetRequiredService<RoleManager<ApplicationRole>>();
+		string[] rolesNames = {"User", "StoreManager", "Owner"};
+
+		foreach (var roleName in rolesNames) {
+			var roleExist = await roleManager.RoleExistsAsync(roleName);	
+
+			if (!roleExist) {
+				await roleManager.CreateAsync(new ApplicationRole{Name = roleName});
 			}
 		}
+	}
 
-		public static async Task InitGenres(IServiceProvider service)
+	public static async Task InitGenres(IServiceProvider service)
+	{
+		var context = service.GetRequiredService<IUnitOfWork>();
+		var seeded = await context.Genre.Get();
+
+		if (seeded.ToArray().Length != 0)
 		{
-			var context = service.GetRequiredService<IUnitOfWork>();
-			var seeded = await context.Genre.Get();
+			Console.WriteLine("Genres already seeded");
+			return;
+		}
 
-			if (seeded.ToArray().Length != 0)
-			{
-				Console.WriteLine("Genres already seeded");
-				return;
-			}
-
-			Genre[] genres = {
+		Genre[] genres = {
 			new Genre {
 				Id = 1,
 				Name = "AAA"
@@ -151,16 +146,14 @@ namespace LibApp.Models
 			},
 			new Genre {
 				Id = 4,
-				Name = "DDD"
+				Name = "SSS"
 			}
 		};
 
-			foreach (var genre in genres)
-			{
-				await context.Genre.Add(genre);
-			}
-
-			await context.Complete();
+		foreach (var genre in genres) {
+			await context.Genre.Add(genre);
 		}
+
+		await context.Complete();
 	}
 }

@@ -17,30 +17,28 @@ using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
-namespace LibApp.Controllers.Api
+namespace LibApp.Controllers.Api;
+
+public class MembershipTypesController : BaseController
 {
-
-	public class MembershipTypesController : BaseController
+	private readonly IUnitOfWork _unit;
+	private readonly IMapper _mapper;
+	public MembershipTypesController(IUnitOfWork unit, IMapper mapper)
 	{
-		private readonly IUnitOfWork _unit;
-		private readonly IMapper _mapper;
-		public MembershipTypesController(IUnitOfWork unit, IMapper mapper)
-		{
-			_unit = unit;
-			_mapper = mapper;
-		}
+		_unit = unit;
+		_mapper = mapper;
+	}
 
-		// GET /api/mstypes
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<MembershipTypeDto>>> GetMembershipTypes()
-		{
-			IEnumerable<MembershipType> msTypes = await _unit.MembershipTypes.Get();
+	// GET /api/mstypes
+	[HttpGet]
+	public async Task<ActionResult<IEnumerable<MembershipTypeDto>>> GetMembershipTypes()
+	{
+		IEnumerable<MembershipType> msTypes = await _unit.MembershipTypes.Get();
 
-			var msTypeDtos = msTypes
-				.ToList()
-				.Select(_mapper.Map<MembershipType, MembershipTypeDto>);
+		var msTypeDtos = msTypes
+			.ToList()
+			.Select(_mapper.Map<MembershipType, MembershipTypeDto>);
 
-			return Ok(msTypeDtos);
-		}
+		return Ok(msTypeDtos);
 	}
 }
