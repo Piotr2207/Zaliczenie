@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
+using LibApp.Interfaces;
 namespace LibApp.Models
 {
 
@@ -75,13 +76,13 @@ namespace LibApp.Models
 			},
 			new Customer
 			{
-				Name = "Marcin",
+				Name = "Karolina",
 				HasNewsletterSubscribed = false,
 				MembershipTypeId = 2,
 			},
 			new Customer
 			{
-				Name = "Aleksandra",
+				Name = "Michal",
 				HasNewsletterSubscribed = true,
 				MembershipTypeId = 3,
 			}
@@ -90,7 +91,7 @@ namespace LibApp.Models
 			foreach (var user in users)
 			{
 				user.UserName = user.Name.ToLower();
-				await userManager.CreateAsync(user, "User1!2#");
+				await userManager.CreateAsync(user, "User5!3@");
 				await userManager.AddToRoleAsync(user, "User");
 			}
 
@@ -103,7 +104,7 @@ namespace LibApp.Models
 				MembershipTypeId = 3,
 			};
 
-			await userManager.CreateAsync(owner, "Wojtek1!2");
+			await userManager.CreateAsync(owner, "Wojtek!21");
 			await userManager.AddToRoleAsync(owner, "Owner");
 
 		}
@@ -122,6 +123,44 @@ namespace LibApp.Models
 					await roleManager.CreateAsync(new ApplicationRole { Name = roleName });
 				}
 			}
+		}
+
+		public static async Task InitGenres(IServiceProvider service)
+		{
+			var context = service.GetRequiredService<IUnitOfWork>();
+			var seeded = await context.Genre.Get();
+
+			if (seeded.ToArray().Length != 0)
+			{
+				Console.WriteLine("Genres already seeded");
+				return;
+			}
+
+			Genre[] genres = {
+			new Genre {
+				Id = 1,
+				Name = "AAA"
+			},
+			new Genre {
+				Id = 2,
+				Name = "BBB"
+			},
+			new Genre {
+				Id = 3,
+				Name = "CCC"
+			},
+			new Genre {
+				Id = 4,
+				Name = "DDD"
+			}
+		};
+
+			foreach (var genre in genres)
+			{
+				await context.Genre.Add(genre);
+			}
+
+			await context.Complete();
 		}
 	}
 }

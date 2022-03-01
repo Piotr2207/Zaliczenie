@@ -86,11 +86,12 @@ namespace LibApp.Controllers
 			if (book.Id == 0)
 			{
 				book.DateAdded = DateTime.Now;
-				var response = await _http.PutAsJsonAsync($"https://localhost:5001/api/books/{book.Id}", book);
+				book.NumberAvailable = book.NumberInStock;
+				var response = await _http.PostAsJsonAsync($"https://localhost:5001/api/books", book);
 
 				if (response.StatusCode != HttpStatusCode.OK)
 				{
-					return BadRequest("Cannot update book");
+					return BadRequest("Cannot create book");
 				}
 			}
 			else

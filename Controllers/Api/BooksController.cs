@@ -41,6 +41,7 @@ namespace LibApp.Controllers.Api
 		[HttpGet]
 		public async Task<IEnumerable<Book>> GetBooks(string query = null)
 		{
+			Console.WriteLine("We are in get API controller");
 			var booksQuery = await _unit.Books.Get(b => b.NumberAvailable > 0);
 
 			if (!String.IsNullOrWhiteSpace(query))
@@ -49,6 +50,15 @@ namespace LibApp.Controllers.Api
 			}
 
 			return booksQuery.ToList();
+		}
+
+		// POST api/books
+		[HttpPost]
+		public async Task<ActionResult> CreateBook(Book book)
+		{
+			await _unit.Books.Add(book);
+			await _unit.Complete();
+			return Ok();
 		}
 
 		// PUT api/books/{id}

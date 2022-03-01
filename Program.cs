@@ -24,6 +24,7 @@ namespace LibApp
 				SeedData.InitMembershipTypes(services);
 				await SeedData.InitRoles(services);
 				await SeedData.InitCustomers(services);
+				await SeedData.InitGenres(services);
 			}
 
 			host.Run();
